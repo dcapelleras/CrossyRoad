@@ -5,13 +5,12 @@ using UnityEngine;
 //allows to move forward if theres an obstacle in front, it has to become the parent of this afterwards, allows to move to the sides if there isnt an obstacle
 public class PlayerTyle : MonoBehaviour
 {
-    bool moving;
-    float counter;
-
     Vector3 origin;
 
     [SerializeField] float rayDistance;
     [SerializeField] float moveDistance;
+    [SerializeField] float groundDistance;
+    
 
     private void Awake()
     {
@@ -20,14 +19,6 @@ public class PlayerTyle : MonoBehaviour
 
     private void Update()
     {
-        if (moving)
-        {
-            counter += Time.deltaTime;
-            if (counter > 1)
-            {
-                moving= false;
-            }
-        }
         RaycastHit hit;
         Debug.DrawRay(transform.position, -transform.right * rayDistance, Color.yellow);
         Debug.DrawRay(transform.position, transform.right * rayDistance, Color.yellow);
@@ -37,6 +28,7 @@ public class PlayerTyle : MonoBehaviour
             if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.left), out hit, rayDistance))
             {
                 Debug.Log("obstacle left");
+                //can make an animation of colliding
                 return; //there is an obstacle in the left
             }
             MoveToTyle("left");
@@ -46,22 +38,28 @@ public class PlayerTyle : MonoBehaviour
             if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.right), out hit, rayDistance))
             {
                 Debug.Log("obstacle right");
+                //can make an animation of colliding
                 return; //there is an obstacle in the right
             }
             MoveToTyle("right");
         }
         else if (Input.GetKeyDown(KeyCode.UpArrow))
         {
-            if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward), out hit, rayDistance)) //if hit is a standing place, move there and parent self to it
+            MoveToTyle("up");
+            TylesSpawner.instance.SpawnTyle();
+        }
+
+        //this to detect if die
+        Debug.DrawRay(transform.position, -transform.up * rayDistance, Color.red);
+        if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.down), out hit, rayDistance))
+        {
+            if (hit.collider.CompareTag("Death"))
             {
-                MoveToTyle("up");
-            }
-            else
-            {
-                Debug.Log("no platform in front");
                 Die();
             }
         }
+
+        
     }
 
     void MoveToTyle(string direction)
@@ -82,10 +80,23 @@ public class PlayerTyle : MonoBehaviour
             newOffset.z = moveDistance;
             transform.position += newOffset;
         }
+
+        //this to detect if grounded
+        RaycastHit hit;
+        Debug.DrawRay(transform.position, -transform.up * groundDistance, Color.black);
+        if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.down), out hit, groundDistance))
+        {
+            transform.parent = hit.transform;
+        }
+        else
+        {
+            transform.parent = null;
+        }
     }
 
     void Die()
     {
         transform.position = origin;
+        transform.parent = null;
     }
 }
