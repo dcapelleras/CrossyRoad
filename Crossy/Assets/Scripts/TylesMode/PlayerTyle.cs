@@ -45,6 +45,7 @@ public class PlayerTyle : MonoBehaviour
         }
         else if (Input.GetKeyDown(KeyCode.UpArrow))
         {
+            GameManager.Instance.ScorePoint();
             MoveToTyle("up");
             TylesSpawner.instance.SpawnTyle();
         }
@@ -98,5 +99,6 @@ public class PlayerTyle : MonoBehaviour
     {
         transform.position = origin;
         transform.parent = null;
+        GameManager.Instance.ResetPoints();
     }
 }
