@@ -10,6 +10,10 @@ public class PlayerTyle : MonoBehaviour
     [SerializeField] float rayDistance;
     [SerializeField] float moveDistance;
     [SerializeField] float groundDistance;
+
+    [SerializeField] AudioSource audioSource;
+    [SerializeField] AudioClip moveClip;
+    [SerializeField] AudioClip dieClip;
     
 
     private void Awake()
@@ -20,43 +24,39 @@ public class PlayerTyle : MonoBehaviour
     private void Update()
     {
         RaycastHit hit;
-        Debug.DrawRay(transform.position, -transform.right * rayDistance, Color.yellow);
-        Debug.DrawRay(transform.position, transform.right * rayDistance, Color.yellow);
-        Debug.DrawRay(transform.position, transform.forward * rayDistance, Color.yellow);
         if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
             if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.left), out hit, rayDistance))
             {
-                Debug.Log("obstacle left");
-                //can make an animation of colliding
                 return; //there is an obstacle in the left
             }
             MoveToTyle("left");
+            audioSource.PlayOneShot(moveClip);
         }
         else if (Input.GetKeyDown(KeyCode.RightArrow))
         {
             if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.right), out hit, rayDistance))
             {
-                Debug.Log("obstacle right");
-                //can make an animation of colliding
                 return; //there is an obstacle in the right
             }
             MoveToTyle("right");
+            audioSource.PlayOneShot(moveClip);
         }
         else if (Input.GetKeyDown(KeyCode.UpArrow))
         {
             GameManager.Instance.ScorePoint();
             MoveToTyle("up");
+            audioSource.PlayOneShot(moveClip);
             TylesSpawner.instance.SpawnTyle();
         }
 
         //this to detect if die
-        Debug.DrawRay(transform.position, -transform.up * rayDistance, Color.red);
         if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.down), out hit, rayDistance))
         {
             if (hit.collider.CompareTag("Death"))
             {
                 Die();
+                audioSource.PlayOneShot(dieClip);
             }
         }
 
