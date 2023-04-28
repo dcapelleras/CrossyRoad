@@ -9,6 +9,7 @@ public class TylesSpawner : MonoBehaviour
     [SerializeField] Vector3 nextSpawnOffset;
     Vector3 currentOffset;
     [SerializeField] int initialAmount;
+    int amountSpawned = 0;
 
     public static TylesSpawner instance;
 
@@ -28,6 +29,11 @@ public class TylesSpawner : MonoBehaviour
     public void SpawnTyle()
     {
         int randomIndex = Random.Range(0, platformPrefabs.Count);
+        if (amountSpawned == 0)
+        {
+            randomIndex= 1;
+        }
+        amountSpawned++;
         Instantiate(platformPrefabs[randomIndex], currentOffset, Quaternion.identity);
         currentOffset += nextSpawnOffset;
     }
